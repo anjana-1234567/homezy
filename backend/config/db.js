@@ -36,6 +36,29 @@ const connectDB = async () => {
   } catch (fallbackError) {
     console.error("MongoDB Atlas connection failed:", fallbackError.message);
   }
+
+  // 3. Background periodic retry if disconnected
+  if (mongoose.connection.readyState !== 1 && !global.__mongoRetryInterval) {
+    global.__mongoRetryInterval = setInterval(async () => {
+      if (mongoose.connection.readyState === 1) {
+        clearInterval(global.__mongoRetryInterval);
+        global.__mongoRetryInterval = null;
+        return;
+      }
+
+      const retryUri = (process.env.MONGO_URI || "").trim().replace(/^["']|["']$/g, "").trim();
+      if (!retryUri) return;
+
+      try {
+        await mongoose.connect(retryUri, { serverSelectionTimeoutMS: 8000 });
+        console.log("MongoDB Atlas connected successfully via background retry");
+        clearInterval(global.__mongoRetryInterval);
+        global.__mongoRetryInterval = null;
+      } catch (err) {
+        // Will retry on next tick
+      }
+    }, 20000);
+  }
 };
 
 module.exports = connectDB;

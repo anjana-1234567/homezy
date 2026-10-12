@@ -1,10 +1,18 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const mongoose = require("mongoose");
 const User = require("../models/User");
 
 // REGISTER USER
 const registerUser = async (req, res) => {
   try {
+    if (mongoose.connection.readyState !== 1) {
+      return res.status(503).json({
+        success: false,
+        message: "Database connection unavailable. Please verify MongoDB Atlas credentials and IP access in Render.",
+      });
+    }
+
     const {
       name,
       email,
@@ -151,6 +159,13 @@ const loginUser = async (req, res) => {
       return res.status(400).json({
         success: false,
         message: "Email and password are required.",
+      });
+    }
+
+    if (mongoose.connection.readyState !== 1) {
+      return res.status(503).json({
+        success: false,
+        message: "Database connection unavailable. Please verify MongoDB Atlas credentials and IP access in Render.",
       });
     }
 
