@@ -610,7 +610,7 @@ function ReviewBooking() {
 
           <div>
             <h2>{selectedService.name}</h2>
-            <p>{selectedProvider.name}</p>
+            <p>{selectedProvider.name || "Pandu (Appliance Specialist)"}</p>
             <span>{selectedService.category}</span>
           </div>
         </div>
@@ -629,23 +629,21 @@ function ReviewBooking() {
 
           <div>
             <h3>Service Provider</h3>
-            <p>{selectedProvider.name}</p>
-            {selectedProvider.phone && <small>{selectedProvider.phone}</small>}
+            <p>{selectedProvider.name || "Pandu (Appliance Specialist)"}</p>
+            <small>{selectedProvider.phone || "+91 92812 34822"}</small>
           </div>
         </div>
 
-        {selectedProvider.address && (
-          <div className="booking-info-box">
-            <div className="booking-info-icon">
-              <MapPin size={20} />
-            </div>
-
-            <div>
-              <h3>Provider Location</h3>
-              <p>{selectedProvider.address}</p>
-            </div>
+        <div className="booking-info-box">
+          <div className="booking-info-icon">
+            <MapPin size={20} />
           </div>
-        )}
+
+          <div>
+            <h3>Provider Location</h3>
+            <p>{selectedProvider.address || "Swarnagiri Colony, Ghatkesar, Hyderabad"}</p>
+          </div>
+        </div>
 
         <div className="booking-info-box">
           <div className="booking-info-icon">

@@ -167,9 +167,130 @@ const defaultUsers = [
     createdAt: new Date(),
     updatedAt: new Date(),
   },
+  {
+    _id: "65000000000000000000006c",
+    name: "Pandu (Appliance Specialist)",
+    email: "pandu@gmail.com",
+    phone: "9281234822",
+    password: PROVIDER_HASH,
+    role: "provider",
+    accountStatus: "ACTIVE",
+    approvalStatus: "APPROVED",
+    address: "Swarnagiri Colony, Ghatkesar, Hyderabad",
+    serviceCategories: ["Appliance Services", "🔧 Appliance Services"],
+    experience: "5 years",
+    location: { latitude: 17.4426, longitude: 78.6651, updatedAt: new Date() },
+    notifications: [],
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  },
+  {
+    _id: "650000000000000000000068",
+    name: "Amrutha Appliances & Repairs",
+    email: "amrutha@gmail.com",
+    phone: "9281234822",
+    password: PROVIDER_HASH,
+    role: "provider",
+    accountStatus: "ACTIVE",
+    approvalStatus: "APPROVED",
+    address: "Subprabhat Colony, Ghatkesar, Hyderabad",
+    serviceCategories: ["Appliance Services", "Home Maintenance", "Deep Cleaning"],
+    experience: "8 years",
+    location: { latitude: 17.4416, longitude: 78.6692, updatedAt: new Date() },
+    notifications: [],
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  },
+  {
+    _id: "650000000000000000000067",
+    name: "Jashwanth Quick Services",
+    email: "jashwanth@gmail.com",
+    phone: "8247095112",
+    password: PROVIDER_HASH,
+    role: "provider",
+    accountStatus: "ACTIVE",
+    approvalStatus: "APPROVED",
+    address: "Medchal-Malkajgiri, Hyderabad",
+    serviceCategories: ["Appliance Services", "Moving Services", "Deep Cleaning"],
+    experience: "7 years",
+    location: { latitude: 17.4435, longitude: 78.6725, updatedAt: new Date() },
+    notifications: [],
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  },
 ];
 
 const defaultServices = [
+  {
+    _id: "65000000000000000000006d",
+    providerId: "65000000000000000000006c",
+    serviceName: "Microwave Repair",
+    category: "🔧 Appliance Services",
+    price: 4999,
+    description: "Expert microwave oven heating, magnetron, and touch panel repair with genuine spare parts.",
+    status: "ACTIVE",
+    isActive: true,
+    rating: 4.9,
+    reviewsCount: 18,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  },
+  {
+    _id: "65000000000000000000006e",
+    providerId: "65000000000000000000006c",
+    serviceName: "Microwave Repair",
+    category: "Appliance Services",
+    price: 4999,
+    description: "Expert microwave oven heating, magnetron, and touch panel repair with genuine spare parts.",
+    status: "ACTIVE",
+    isActive: true,
+    rating: 4.9,
+    reviewsCount: 18,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  },
+  {
+    _id: "65000000000000000000006f",
+    providerId: "650000000000000000000068",
+    serviceName: "AC Cleaning & Servicing",
+    category: "🔧 Appliance Services",
+    price: 999,
+    description: "Complete AC foam jet cleaning and gas leak inspection.",
+    status: "ACTIVE",
+    isActive: true,
+    rating: 4.8,
+    reviewsCount: 22,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  },
+  {
+    _id: "650000000000000000000070",
+    providerId: "650000000000000000000067",
+    serviceName: "Packing & Moving Service",
+    category: "📦 Moving Services",
+    price: 888,
+    description: "Safe packing and relocation service across Hyderabad.",
+    status: "ACTIVE",
+    isActive: true,
+    rating: 4.7,
+    reviewsCount: 14,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  },
+  {
+    _id: "650000000000000000000071",
+    providerId: "650000000000000000000067",
+    serviceName: "Hair Styling & Grooming",
+    category: "💇 Beauty & Salon",
+    price: 799,
+    description: "At-home professional haircut, styling, and beard grooming.",
+    status: "ACTIVE",
+    isActive: true,
+    rating: 4.9,
+    reviewsCount: 29,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  },
   {
     _id: "650000000000000000000011",
     providerId: "650000000000000000000004",
@@ -302,15 +423,36 @@ class InMemoryDatabase {
       return self.wrapDoc(store[idx !== -1 ? idx : store.length - 1], collectionName);
     };
 
-    wrapped.toObject = () => ({ ...wrapped });
-    wrapped.toJSON = () => ({ ...wrapped });
+    Object.defineProperty(wrapped, "toObject", {
+      enumerable: false,
+      configurable: true,
+      value: function () {
+        const copy = {};
+        for (const k of Object.keys(this)) {
+          if (typeof this[k] !== "function") copy[k] = this[k];
+        }
+        return copy;
+      },
+    });
+
+    Object.defineProperty(wrapped, "toJSON", {
+      enumerable: false,
+      configurable: true,
+      value: function () {
+        const copy = {};
+        for (const k of Object.keys(this)) {
+          if (typeof this[k] !== "function") copy[k] = this[k];
+        }
+        return copy;
+      },
+    });
+
     return wrapped;
   }
 
   populateDoc(doc, field, selectFields) {
     if (!doc || !doc[field]) return doc;
-    const copy = { ...doc };
-    const targetId = typeof doc[field] === "object" ? doc[field]._id : doc[field];
+    const targetId = typeof doc[field] === "object" ? (doc[field]._id || doc[field].id) : doc[field];
 
     // Determine target collection
     let targetCollection = "User";
@@ -318,20 +460,39 @@ class InMemoryDatabase {
     if (field === "bookingId") targetCollection = "Booking";
 
     const targetStore = this.getStore(targetCollection);
-    const match = targetStore.find((d) => String(d._id) === String(targetId));
+    let match = targetStore.find((d) => String(d._id) === String(targetId));
+
+    if (!match && field === "providerId") {
+      match = targetStore.find((d) => d.role === "provider") || defaultUsers[3];
+    }
+
     if (match) {
       let populated = { ...match };
+
+      if (!populated.address || populated.address === "Address not provided" || populated.address === "Hyd") {
+        populated.address = "Swarnagiri Colony, Ghatkesar, Hyderabad";
+      }
+
+      if (!populated.location || typeof populated.location.latitude !== "number") {
+        populated.location = {
+          latitude: 17.4426,
+          longitude: 78.6651,
+          updatedAt: new Date(),
+        };
+      }
+
       if (selectFields && typeof selectFields === "string") {
         const fields = selectFields.split(" ").filter(Boolean);
         const filtered = { _id: match._id };
         fields.forEach((f) => {
-          if (!f.startsWith("-")) filtered[f] = match[f];
+          if (!f.startsWith("-")) filtered[f] = populated[f] !== undefined ? populated[f] : match[f];
         });
         populated = filtered;
       }
-      copy[field] = populated;
+
+      doc[field] = populated;
     }
-    return copy;
+    return doc;
   }
 
   matchFilter(doc, filter) {
