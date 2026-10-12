@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 
 import RegisterCollage from "../components/RegisterCollage";
+import { API_ENDPOINTS } from "../config/api";
 import "../index.css";
 
 const serviceCategories = {
@@ -146,7 +147,7 @@ function Register() {
 
     try {
       const response = await fetch(
-        "http://localhost:5000/api/auth/register",
+        `${API_ENDPOINTS.AUTH}/register`,
         {
           method: "POST",
           headers: {

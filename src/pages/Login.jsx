@@ -10,6 +10,7 @@ import {
   Phone,
 } from "lucide-react";
 import AuthCollage from "../components/AuthCollage";
+import { API_ENDPOINTS } from "../config/api";
 import "./Login.css";
 
 function Login() {
@@ -35,7 +36,7 @@ function Login() {
 
     try {
       const response = await fetch(
-        "http://localhost:5000/api/auth/login",
+        `${API_ENDPOINTS.AUTH}/login`,
         {
           method: "POST",
           headers: {

@@ -21,6 +21,7 @@ import {
   getSavedLocation,
   getCurrentLocation,
 } from "../../utils/location";
+import { API_ENDPOINTS } from "../../config/api";
 
 function Profile() {
   const navigate = useNavigate();
@@ -60,7 +61,7 @@ function Profile() {
         setStatsLoading(true);
 
         const response = await fetch(
-          `http://localhost:5000/api/bookings/customer/${userId}`
+          `${API_ENDPOINTS.BOOKINGS}/customer/${userId}`
         );
         const data = await response.json();
 

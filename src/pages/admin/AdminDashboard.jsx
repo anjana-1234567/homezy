@@ -23,24 +23,12 @@ import {
 
 
 } from "lucide-react";
+import { API_ENDPOINTS } from "../../config/api";
 
-
-
-
-
-
-
-const API = "http://localhost:5000/api/admin";
-
-
-
-const COMPLAINT_API = "http://localhost:5000/api/complaints";
-
-
-
-const REVIEW_API = "http://localhost:5000/api/reviews";
-
-const SERVICE_API = "http://localhost:5000/api/services";
+const API = API_ENDPOINTS.ADMIN;
+const COMPLAINT_API = API_ENDPOINTS.COMPLAINTS;
+const REVIEW_API = API_ENDPOINTS.REVIEWS;
+const SERVICE_API = API_ENDPOINTS.SERVICES;
 
 
 

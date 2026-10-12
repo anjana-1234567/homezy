@@ -11,6 +11,7 @@ import {
   CalendarCheck,
   MessageSquare,
 } from "lucide-react";
+import { API_ENDPOINTS } from "../../config/api";
 
 function Complaints() {
   const navigate = useNavigate();
@@ -43,7 +44,7 @@ function Complaints() {
 
     try {
       const response = await fetch(
-        `http://localhost:5000/api/bookings/customer/${userId}`
+        `${API_ENDPOINTS.BOOKINGS}/customer/${userId}`
       );
       const data = await response.json();
 
@@ -63,7 +64,7 @@ function Complaints() {
 
     try {
       const response = await fetch(
-        `http://localhost:5000/api/complaints/customer/${userId}`
+        `${API_ENDPOINTS.COMPLAINTS}/customer/${userId}`
       );
       const data = await response.json();
 
@@ -177,7 +178,7 @@ function Complaints() {
       setSubmitting(true);
       setMessage("");
 
-      const response = await fetch("http://localhost:5000/api/complaints", {
+      const response = await fetch(API_ENDPOINTS.COMPLAINTS, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

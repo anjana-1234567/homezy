@@ -25,6 +25,7 @@ import {
   getSavedLocation,
   getCurrentLocation,
 } from "../../utils/location";
+import { API_ENDPOINTS } from "../../config/api";
 
 import "./Provider.css";
 
@@ -138,7 +139,7 @@ function ProviderProfile() {
 
         const response =
           await fetch(
-            `http://localhost:5000/api/auth/user/${providerId}`
+            `${API_ENDPOINTS.AUTH}/user/${providerId}`
           );
 
         const data =
@@ -356,7 +357,7 @@ function ProviderProfile() {
 
         const response =
           await fetch(
-            `http://localhost:5000/api/auth/user/${providerId}`,
+            `${API_ENDPOINTS.AUTH}/user/${providerId}`,
             {
               method: "PUT",
 
@@ -503,7 +504,7 @@ function ProviderProfile() {
 
         const response =
           await fetch(
-            `http://localhost:5000/api/auth/user/${providerId}`
+            `${API_ENDPOINTS.AUTH}/user/${providerId}`
           );
 
         const data =

@@ -5,6 +5,7 @@ import {
   Bell, MapPin, Navigation, CheckCircle, XCircle, Clock, ChevronRight,
 } from "lucide-react";
 import { getSavedLocation, getCurrentLocation } from "../../utils/location";
+import { API_ENDPOINTS } from "../../config/api";
 import "./Provider.css";
 
 function ProviderDashboard() {
@@ -72,7 +73,7 @@ function ProviderDashboard() {
       setError("");
 
       const requestsResponse = await fetch(
-        `http://localhost:5000/api/bookings/provider/${providerId}/requests`
+        `${API_ENDPOINTS.BOOKINGS}/provider/${providerId}/requests`
       );
       if (!requestsResponse.ok) throw new Error("Failed to load booking requests");
       const requestsData = await requestsResponse.json();
@@ -84,7 +85,7 @@ function ProviderDashboard() {
       setAcceptedJobs(Number(requestsData.counts?.accepted ?? 0));
 
       const jobsResponse = await fetch(
-        `http://localhost:5000/api/bookings/provider/${providerId}/jobs`
+        `${API_ENDPOINTS.BOOKINGS}/provider/${providerId}/jobs`
       );
       if (!jobsResponse.ok) throw new Error("Failed to load provider jobs");
       const jobsData = await jobsResponse.json();
@@ -97,7 +98,7 @@ function ProviderDashboard() {
       setTodayJobs(todaysJobs.slice(0, 5));
 
       const earningsResponse = await fetch(
-        `http://localhost:5000/api/bookings/provider/${providerId}/earnings`
+        `${API_ENDPOINTS.BOOKINGS}/provider/${providerId}/earnings`
       );
       if (!earningsResponse.ok) throw new Error("Failed to load earnings");
       const earningsData = await earningsResponse.json();
@@ -108,7 +109,7 @@ function ProviderDashboard() {
       // Fetch provider's average rating
 try {
   const reviewsResponse = await fetch(
-    `http://localhost:5000/api/reviews/provider/${providerId}`
+    `${API_ENDPOINTS.REVIEWS}/provider/${providerId}`
   );
 
   if (!reviewsResponse.ok) {

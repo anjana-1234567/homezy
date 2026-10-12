@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { API_ENDPOINTS } from "../config/api";
 
 function AdminLogin() {
   const navigate = useNavigate();
@@ -23,7 +24,7 @@ function AdminLogin() {
       setLoading(true);
 
       const response = await fetch(
-        "http://localhost:5000/api/auth/login",
+        `${API_ENDPOINTS.AUTH}/login`,
         {
           method: "POST",
           headers: {

@@ -19,6 +19,7 @@ import {
   RefreshCw,
 } from "lucide-react";
 
+import { API_ENDPOINTS } from "../../config/api";
 import "./Provider.css";
 
 function ProviderEarnings() {
@@ -60,7 +61,7 @@ function ProviderEarnings() {
       setError("");
 
       const response = await fetch(
-        `http://localhost:5000/api/bookings/provider/${providerId}/earnings`
+        `${API_ENDPOINTS.BOOKINGS}/provider/${providerId}/earnings`
       );
 
       const data = await response.json();

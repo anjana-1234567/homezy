@@ -11,8 +11,7 @@ import {
   CreditCard,
   Star,
 } from "lucide-react";
-
-const API_URL = "http://localhost:5000";
+import { API_ENDPOINTS } from "../../config/api";
 
 const loadRazorpayScript = () =>
   new Promise((resolve) => {
@@ -90,7 +89,7 @@ function ReviewBooking() {
     try {
       setLoading(true);
 
-      const response = await fetch(`${API_URL}/api/reviews`, {
+      const response = await fetch(API_ENDPOINTS.REVIEWS, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -147,7 +146,7 @@ function ReviewBooking() {
     try {
       setLoading(true);
 
-      const response = await fetch(`${API_URL}/api/bookings`, {
+      const response = await fetch(API_ENDPOINTS.BOOKINGS, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -188,7 +187,7 @@ function ReviewBooking() {
       }
 
       const orderResponse = await fetch(
-        `${API_URL}/api/payments/create-order`,
+        `${API_ENDPOINTS.PAYMENTS}/create-order`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -218,7 +217,7 @@ function ReviewBooking() {
             setLoading(true);
 
             const verifyResponse = await fetch(
-              `${API_URL}/api/payments/verify`,
+              `${API_ENDPOINTS.PAYMENTS}/verify`,
               {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },

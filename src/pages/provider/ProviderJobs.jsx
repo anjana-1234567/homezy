@@ -20,6 +20,7 @@ import {
   Phone,
 } from "lucide-react";
 
+import { API_ENDPOINTS } from "../../config/api";
 import "./Provider.css";
 
 function ProviderJobs() {
@@ -67,7 +68,7 @@ function ProviderJobs() {
       setError("");
 
       const response = await fetch(
-        `http://localhost:5000/api/bookings/provider/${providerId}/jobs`
+        `${API_ENDPOINTS.BOOKINGS}/provider/${providerId}/jobs`
       );
 
       const data = await response.json();
@@ -110,7 +111,7 @@ function ProviderJobs() {
       setActionLoading(bookingId);
 
       const response = await fetch(
-        `http://localhost:5000/api/bookings/${bookingId}/status`,
+        `${API_ENDPOINTS.BOOKINGS}/${bookingId}/status`,
         {
           method: "PUT",
           headers: {

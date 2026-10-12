@@ -44,6 +44,7 @@ import {
   getSavedLocation,
   getCurrentLocation,
 } from "../../utils/location";
+import { API_ENDPOINTS } from "../../config/api";
 
 // Leaflet marker icons
 const customerIcon = new L.Icon({
@@ -202,7 +203,7 @@ function FindServices() {
       setServicesError("");
 
       const response = await fetch(
-        "http://localhost:5000/api/services"
+        API_ENDPOINTS.SERVICES
       );
 
       const data = await response.json();
@@ -508,7 +509,7 @@ function FindServices() {
         });
 
         const response = await fetch(
-          `http://localhost:5000/api/location/distances?${query.toString()}`
+          `${API_ENDPOINTS.LOCATION}/distances?${query.toString()}`
         );
 
         const data = await response.json();
@@ -568,7 +569,7 @@ function FindServices() {
         const results = await Promise.all(
           providerIds.map(async (providerId) => {
             const response = await fetch(
-              `http://localhost:5000/api/reviews/provider/${providerId}`
+              `${API_ENDPOINTS.REVIEWS}/provider/${providerId}`
             );
 
             const data = await response.json();

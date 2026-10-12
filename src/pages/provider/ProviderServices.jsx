@@ -15,6 +15,7 @@ import {
   CheckCircle,
   XCircle,
 } from "lucide-react";
+import { API_ENDPOINTS } from "../../config/api";
 
 function ProviderServices() {
   const navigate = useNavigate();
@@ -151,7 +152,7 @@ function ProviderServices() {
       setLoading(true);
 
       const response = await fetch(
-        `http://localhost:5000/api/services/provider/${providerId}`
+        `${API_ENDPOINTS.SERVICES}/provider/${providerId}`
       );
 
       const data = await response.json();
@@ -317,7 +318,7 @@ function ProviderServices() {
 
       if (editingServiceId) {
         const response = await fetch(
-          `http://localhost:5000/api/services/${editingServiceId}`,
+          `${API_ENDPOINTS.SERVICES}/${editingServiceId}`,
           {
             method: "PUT",
 
@@ -362,7 +363,7 @@ function ProviderServices() {
 
       else {
         const response = await fetch(
-          "http://localhost:5000/api/services",
+          API_ENDPOINTS.SERVICES,
           {
             method: "POST",
 
@@ -449,7 +450,7 @@ function ProviderServices() {
 
     try {
       const response = await fetch(
-        `http://localhost:5000/api/services/${service._id}`,
+        `${API_ENDPOINTS.SERVICES}/${service._id}`,
         {
           method: "DELETE",
         }
@@ -497,7 +498,7 @@ function ProviderServices() {
 
     try {
       const response = await fetch(
-        `http://localhost:5000/api/services/${service._id}`,
+        `${API_ENDPOINTS.SERVICES}/${service._id}`,
         {
           method: "PUT",
 

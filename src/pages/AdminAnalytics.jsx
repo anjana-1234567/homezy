@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { API_ENDPOINTS } from "../config/api";
 
 import { useNavigate } from "react-router-dom";
 
@@ -119,9 +120,7 @@ const AdminAnalytics = () => {
 
 
         const response = await fetch(
-
-          "http://localhost:5000/api/admin/analytics"
-
+          `${API_ENDPOINTS.ADMIN}/analytics`
         );
 
         const data = await response.json();

@@ -2,6 +2,8 @@
 // HOMEZY LOCATION UTILITY
 // ========================================
 
+import { API_ENDPOINTS } from "../config/api";
+
 // We store location separately for every logged-in user.
 // Example:
 // homezy_location_67abc123
@@ -263,7 +265,7 @@ export const getCurrentLocation = async (
   // ----------------------------------------
 
   const response = await fetch(
-    `http://localhost:5000/api/location/${actualUserId}`,
+    `${API_ENDPOINTS.LOCATION}/${actualUserId}`,
     {
       method: "PUT",
 

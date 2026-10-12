@@ -19,6 +19,7 @@ import {
   Phone,
   Check,
 } from "lucide-react";
+import { API_ENDPOINTS } from "../../config/api";
 
 function MyBookings() {
   const navigate = useNavigate();
@@ -48,7 +49,7 @@ function MyBookings() {
       if (!silent) setLoading(true);
 
       const response = await fetch(
-        `http://localhost:5000/api/bookings/customer/${customerId}`
+        `${API_ENDPOINTS.BOOKINGS}/customer/${customerId}`
       );
       const data = await response.json();
 
@@ -208,7 +209,7 @@ function MyBookings() {
 
     try {
       const response = await fetch(
-        `http://localhost:5000/api/bookings/${booking._id}/status`,
+        `${API_ENDPOINTS.BOOKINGS}/${booking._id}/status`,
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
