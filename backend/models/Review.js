@@ -45,4 +45,6 @@ const reviewSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-module.exports = mongoose.model("Review", reviewSchema);
+const { getModel } = require("../config/inMemoryDb");
+const MongooseReview = mongoose.model("Review", reviewSchema);
+module.exports = getModel("Review", MongooseReview);

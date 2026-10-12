@@ -130,4 +130,6 @@ timestamps: true,
 }
 );
 
-module.exports = mongoose.model("Booking", bookingSchema);
+const { getModel } = require("../config/inMemoryDb");
+const MongooseBooking = mongoose.model("Booking", bookingSchema);
+module.exports = getModel("Booking", MongooseBooking);

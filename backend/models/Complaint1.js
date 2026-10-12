@@ -73,8 +73,6 @@ complaintSchema.index(
   }
 );
 
-module.exports =
-  mongoose.model(
-    "Complaint",
-    complaintSchema
-  );
+const { getModel } = require("../config/inMemoryDb");
+const MongooseComplaint = mongoose.model("Complaint", complaintSchema);
+module.exports = getModel("Complaint", MongooseComplaint);

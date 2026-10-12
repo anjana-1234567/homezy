@@ -171,7 +171,6 @@ const userSchema = new mongoose.Schema(
   }
 );
 
-module.exports = mongoose.model(
-  "User",
-  userSchema
-);
+const { getModel } = require("../config/inMemoryDb");
+const MongooseUser = mongoose.model("User", userSchema);
+module.exports = getModel("User", MongooseUser);

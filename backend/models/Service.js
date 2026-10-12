@@ -43,7 +43,6 @@ const serviceSchema = new mongoose.Schema(
   }
 );
 
-module.exports = mongoose.model(
-  "Service",
-  serviceSchema
-);
+const { getModel } = require("../config/inMemoryDb");
+const MongooseService = mongoose.model("Service", serviceSchema);
+module.exports = getModel("Service", MongooseService);

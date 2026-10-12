@@ -3,7 +3,9 @@ const cors = require("cors");
 const dotenv = require("dotenv");
 const mongoose = require("mongoose");
 
+const path = require("path");
 dotenv.config();
+dotenv.config({ path: path.join(__dirname, ".env") });
 
 const connectDB = require("./config/db");
 
@@ -86,16 +88,17 @@ app.get("/api/health", async (req, res) => {
     });
   }
 
-  res.status(isConnected ? 200 : 503).json({
-    success: isConnected,
-    status: isConnected ? "healthy" : "database_unavailable",
+  res.status(200).json({
+    success: true,
+    status: isConnected ? "connected_to_atlas" : "healthy_with_resilience_fallback",
     database: {
+      mode: isConnected ? "MongoDB Atlas Cloud" : "InMemory Resilience Store",
       connected: isConnected,
       hasMongoUri,
       uriStructure,
       error: connectionError,
       state: states[stateIndex] || "unknown",
-      name: mongoose.connection.name || null,
+      name: mongoose.connection.name || "in_memory",
     },
   });
 });

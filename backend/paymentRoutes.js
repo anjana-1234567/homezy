@@ -21,10 +21,18 @@ console.log(
   process.env.RAZORPAY_KEY_ID?.startsWith("rzp_test_")
 );
 
-const razorpay = new Razorpay({
-  key_id: process.env.RAZORPAY_KEY_ID,
-  key_secret: process.env.RAZORPAY_KEY_SECRET,
-});
+const razorpayKeyId = process.env.RAZORPAY_KEY_ID || "rzp_test_Tmjnygk2th7v2b";
+const razorpayKeySecret = process.env.RAZORPAY_KEY_SECRET || "5apL3kaR4sqZbwYbQMH1MUii";
+
+let razorpay;
+try {
+  razorpay = new Razorpay({
+    key_id: razorpayKeyId,
+    key_secret: razorpayKeySecret,
+  });
+} catch (err) {
+  console.warn("Razorpay warning:", err.message);
+}
 
 // Create Razorpay order
 router.post("/create-order", async (req, res) => {

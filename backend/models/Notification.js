@@ -46,7 +46,6 @@ const notificationSchema = new mongoose.Schema(
   }
 );
 
-module.exports = mongoose.model(
-  "Notification",
-  notificationSchema
-);
+const { getModel } = require("../config/inMemoryDb");
+const MongooseNotification = mongoose.model("Notification", notificationSchema);
+module.exports = getModel("Notification", MongooseNotification);
