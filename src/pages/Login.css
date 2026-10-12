@@ -1,0 +1,567 @@
+/* HOMEZY LOGIN PAGE — COPPER & BROWN */
+/* File: src/pages/Login.css */
+
+@import url('https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,500;6..96,600&family=Jost:wght@400;500;600;700&display=swap');
+
+.hz-auth-page {
+  --hz-brown: #2d1c16;
+  --hz-copper: #c68b59;
+  --hz-cream: #f5ede3;
+  --hz-text: #30221c;
+
+  min-height: 100vh;
+  background: #fff;
+  color: var(--hz-text);
+  font-family: "Jost", sans-serif;
+}
+
+.hz-auth-page *,
+.hz-auth-page *::before,
+.hz-auth-page *::after {
+  box-sizing: border-box;
+}
+
+.hz-topbar {
+  min-height: 38px;
+  padding: 8px 5%;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px 26px;
+  background: var(--hz-brown);
+  color: #e7c09c;
+  font-size: 12px;
+}
+
+.hz-topbar > div {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.hz-topbar .hz-location {
+  margin-left: auto;
+  color: #f7eee6;
+}
+
+.hz-navbar {
+  min-height: 76px;
+  padding: 14px 5%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  background: #fff;
+}
+
+.hz-brand,
+.hz-footer-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--hz-brown);
+  text-decoration: none;
+  font-size: 27px;
+  font-weight: 700;
+}
+
+.hz-brand-icon {
+  width: 29px;
+  height: 29px;
+  display: grid;
+  place-items: center;
+  border-radius: 6px;
+  background: var(--hz-copper);
+  color: #fff;
+}
+
+.hz-nav-links {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 25px;
+}
+
+.hz-nav-links a {
+  color: #211a17;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.hz-nav-links a.active,
+.hz-nav-links a:hover {
+  color: var(--hz-copper);
+}
+
+.hz-book-button {
+  padding: 13px 21px;
+  border-radius: 3px;
+  background: var(--hz-copper);
+  color: #fff;
+  text-decoration: none;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .04em;
+}
+
+/* Hero heading */
+
+.hz-auth-hero {
+  min-height: 250px;
+  padding: 48px 20px 32px;
+  text-align: center;
+  color: #fff;
+  background-color: var(--hz-brown);
+  background-image:
+    linear-gradient(35deg, transparent 48%, rgba(255,255,255,.035) 49%, rgba(255,255,255,.035) 50%, transparent 51%),
+    linear-gradient(145deg, transparent 48%, rgba(255,255,255,.035) 49%, rgba(255,255,255,.035) 50%, transparent 51%);
+  background-size: 260px 260px;
+}
+
+.hz-auth-hero h1 {
+  margin: 0;
+  font-family: "Bodoni Moda", Georgia, serif;
+  font-size: clamp(36px, 4.5vw, 58px);
+  line-height: 1.18;
+  letter-spacing: .035em;
+  font-weight: 500;
+}
+
+.hz-auth-hero h1 span {
+  color: var(--hz-copper);
+  font-style: italic;
+}
+
+.hz-breadcrumb {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 18px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .13em;
+}
+
+.hz-breadcrumb span {
+  color: var(--hz-copper);
+  font-size: 20px;
+}
+
+/* Login layout */
+
+.hz-auth-main {
+  width: min(1220px, 94%);
+  margin: 0 auto;
+  padding: 58px 0 64px;
+  display: grid;
+  grid-template-columns: minmax(0, 1.08fr) minmax(0, .92fr);
+  align-items: center;
+  gap: 64px;
+}
+
+.hz-auth-illustration {
+  min-width: 0;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hz-auth-illustration .collage {
+  width: 100%;
+  max-width: 540px;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.hz-auth-illustration .collage-room {
+  width: 100%;
+}
+
+.hz-auth-illustration .collage-room svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* Hide the Homezy badge beneath the illustration, if AuthCollage renders it */
+
+.hz-auth-illustration .collage-brand {
+  display: none !important;
+}
+
+/* Login form card */
+
+.hz-login-card {
+  width: 100%;
+  max-width: 510px;
+  min-width: 0;
+  justify-self: end;
+  padding: 34px;
+  border: 1px solid #f0e5d9;
+  border-radius: 4px;
+  background-color: #f8f1e9;
+  background-image: repeating-linear-gradient(
+    135deg,
+    transparent 0 13px,
+    rgba(128, 91, 61, .025) 13px 14px
+  );
+}
+
+.hz-auth-tabs {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  width: fit-content;
+  margin: 0 0 25px auto;
+  padding: 4px;
+  gap: 4px;
+  background: #fff;
+}
+
+.hz-auth-tabs a,
+.hz-auth-tabs button {
+  border: 0;
+  padding: 12px 15px;
+  background: transparent;
+  color: var(--hz-brown);
+  font: 700 11px "Jost", sans-serif;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.hz-auth-tabs .selected {
+  background: var(--hz-copper);
+  color: #fff;
+}
+
+.hz-login-card h2 {
+  margin: 0 0 6px;
+  color: var(--hz-brown);
+  font-size: 32px;
+  font-weight: 600;
+}
+
+.hz-login-subtitle {
+  margin: 0 0 28px;
+  color: #8a7a6e;
+  font-size: 14px;
+}
+
+/* Input fields */
+
+.hz-login-input {
+  min-height: 54px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 15px;
+  padding: 0 14px;
+  overflow: hidden;
+  border: 1px solid #eee2d5;
+  border-radius: 3px;
+  background: #fff;
+  color: #b9a696;
+  transition: border-color .2s, box-shadow .2s;
+}
+
+.hz-login-input:focus-within {
+  border-color: var(--hz-copper);
+  box-shadow: 0 0 0 2px rgba(198, 139, 89, .12);
+}
+
+.hz-login-input input,
+.hz-login-input input:focus,
+.hz-login-input input:active {
+  width: 100%;
+  min-width: 0;
+  height: 52px;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  box-shadow: none;
+  background: #fff;
+  color: var(--hz-text);
+  font: 14px "Jost", sans-serif;
+}
+
+/* Prevent Chrome autofill from showing a blue input */
+
+.hz-login-input input:-webkit-autofill,
+.hz-login-input input:-webkit-autofill:hover,
+.hz-login-input input:-webkit-autofill:focus,
+.hz-login-input input:-webkit-autofill:active {
+  -webkit-text-fill-color: var(--hz-text);
+  -webkit-box-shadow: 0 0 0 1000px #fff inset;
+  box-shadow: 0 0 0 1000px #fff inset;
+  transition: background-color 9999s ease-out;
+}
+
+.hz-lock {
+  flex-shrink: 0;
+  font-size: 15px;
+}
+
+.hz-eye {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  padding: 4px;
+  border: 0;
+  background: transparent;
+  color: #786b62;
+  cursor: pointer;
+}
+
+.hz-login-options {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin: 5px 0 23px;
+  color: #82756b;
+  font-size: 12px;
+}
+
+.hz-login-options label {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.hz-login-options input[type="checkbox"] {
+  accent-color: var(--hz-copper);
+}
+
+.hz-login-options a {
+  color: #64534a;
+  text-decoration: none;
+}
+
+.hz-login-options a:hover {
+  color: var(--hz-copper);
+}
+
+/* Submit button and messages */
+
+.hz-submit-button {
+  width: 100%;
+  min-height: 52px;
+  border: 0;
+  border-radius: 3px;
+  background: var(--hz-copper);
+  color: #fff;
+  font: 700 13px "Jost", sans-serif;
+  letter-spacing: .1em;
+  cursor: pointer;
+  transition: background .2s;
+}
+
+.hz-submit-button:hover {
+  background: #ae7547;
+}
+
+.hz-submit-button:disabled {
+  opacity: .65;
+  cursor: wait;
+}
+
+.hz-success,
+.hz-error {
+  margin: 0 0 14px;
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+
+.hz-success {
+  color: #287747;
+}
+
+.hz-error {
+  color: #b42318;
+}
+
+.hz-register-prompt {
+  margin: 25px 0;
+  text-align: center;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .025em;
+}
+
+.hz-register-prompt a {
+  color: var(--hz-copper);
+  text-decoration: none;
+}
+
+.hz-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #8d7f73;
+  font-size: 12px;
+}
+
+.hz-divider::before,
+.hz-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: #dfd1c3;
+}
+
+.hz-social-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.hz-social-buttons button {
+  width: 42px;
+  height: 42px;
+  border: 0;
+  border-radius: 4px;
+  background: #fff;
+  color: var(--hz-brown);
+  font-size: 17px;
+  font-weight: 700;
+  box-shadow: 0 3px 10px rgba(45, 28, 22, .08);
+  cursor: pointer;
+}
+
+/* Keep the login page footer simple: no palette or second Homezy logo */
+
+.hz-footer,
+.hz-footer-palette,
+.hz-footer-brand {
+  display: none !important;
+}
+
+.hz-footer-contact-only {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  padding: 18px;
+  border-top: 1px solid #f0e5d9;
+  background: #fff;
+  color: #786b62;
+  font-size: 12px;
+}
+
+.hz-footer-contact-only strong {
+  color: var(--hz-brown);
+}
+
+.hz-footer-contact-only a {
+  color: var(--hz-copper);
+  text-decoration: none;
+}
+
+/* Responsive layout */
+
+@media (max-width: 900px) {
+  .hz-nav-links {
+    gap: 14px;
+  }
+
+  .hz-auth-main {
+    gap: 32px;
+  }
+
+  .hz-login-card {
+    padding: 26px;
+  }
+}
+
+@media (max-width: 760px) {
+  .hz-auth-main {
+    grid-template-columns: 1fr;
+    gap: 26px;
+    padding: 34px 0 44px;
+  }
+
+  .hz-auth-illustration .collage {
+    max-width: 450px;
+  }
+
+  .hz-login-card {
+    max-width: 520px;
+    justify-self: center;
+    padding: 25px;
+  }
+
+  .hz-auth-hero {
+    min-height: 220px;
+    padding-top: 42px;
+  }
+}
+
+@media (max-width: 600px) {
+  .hz-topbar {
+    gap: 8px 14px;
+  }
+
+  .hz-topbar .hz-location {
+    margin-left: 0;
+  }
+
+  .hz-navbar {
+    flex-wrap: wrap;
+    gap: 15px;
+  }
+
+  .hz-brand {
+    font-size: 23px;
+  }
+
+  .hz-book-button {
+    padding: 11px 14px;
+  }
+
+  .hz-nav-links {
+    order: 3;
+    width: 100%;
+    gap: 12px 18px;
+  }
+
+  .hz-nav-links a {
+    font-size: 12px;
+  }
+
+  .hz-auth-hero {
+    min-height: 200px;
+    padding: 38px 14px 28px;
+  }
+
+  .hz-auth-hero h1 {
+    font-size: clamp(30px, 8vw, 38px);
+  }
+
+  .hz-login-card {
+    padding: 22px 17px;
+  }
+
+  .hz-login-options {
+    align-items: flex-start;
+  }
+}
+
+@media (max-width: 380px) {
+  .hz-login-options {
+    flex-wrap: wrap;
+  }
+
+  .hz-footer-contact-only {
+    flex-direction: column;
+    gap: 5px;
+  }
+}
+.hz-auth-hero h1 .white-text {
+  color: #FFFFFF !important;
+  -webkit-text-fill-color: #FFFFFF !important;
+}
