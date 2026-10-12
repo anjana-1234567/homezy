@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
+const mongoose = require("mongoose");
 
 dotenv.config();
 
@@ -18,10 +19,33 @@ const paymentRoutes = require("./paymentRoutes");
 const app = express();
 
 // DATABASE
-connectDB();
+connectDB().catch((err) => {
+  console.error("Database connection caught error:", err.message);
+});
 
-// MIDDLEWARE
-app.use(cors());
+// CORS CONFIGURATION
+const allowedOrigins = [
+  "https://homezy-gold.vercel.app",
+  "http://localhost:5173",
+  "http://localhost:3000",
+];
+
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      // Allow requests with no origin (like mobile apps, curl, server-to-server)
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.includes(origin) || origin.endsWith(".vercel.app")) {
+        return callback(null, true);
+      }
+      return callback(null, true);
+    },
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
+
 app.use(express.json());
 app.use("/api/reviews", reviewRoutes);
 
@@ -34,13 +58,29 @@ app.use("/api/complaints", complaintRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/payments", paymentRoutes);
 
+// HEALTH & STATUS ROUTE
+app.get("/api/health", (req, res) => {
+  const stateIndex = mongoose.connection.readyState;
+  const states = ["disconnected", "connected", "connecting", "disconnecting"];
+  const isConnected = stateIndex === 1;
+
+  res.status(isConnected ? 200 : 503).json({
+    success: isConnected,
+    status: isConnected ? "healthy" : "database_unavailable",
+    database: {
+      connected: isConnected,
+      state: states[stateIndex] || "unknown",
+      name: mongoose.connection.name || null,
+    },
+  });
+});
 
 // HOME ROUTE
 app.get("/", (req, res) => {
-res.status(200).json({
-success: true,
-message: "Homezy Backend is running!",
-});
+  res.status(200).json({
+    success: true,
+    message: "Homezy Backend is running!",
+  });
 });
 
 // TEST ROUTES

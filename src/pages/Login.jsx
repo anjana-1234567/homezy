@@ -46,7 +46,12 @@ function Login() {
         }
       );
 
-      const data = await response.json();
+      let data = {};
+      try {
+        data = await response.json();
+      } catch {
+        data = { message: `Server responded with status ${response.status}. Please try again.` };
+      }
 
       if (!response.ok) {
         setMessage(data.message || "Login failed");
