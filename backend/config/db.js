@@ -2,14 +2,16 @@ const dns = require("node:dns");
 const mongoose = require("mongoose");
 
 const connectDB = async () => {
-  if (!process.env.MONGO_URI) {
+  const uri = (process.env.MONGO_URI || "").trim().replace(/^["']|["']$/g, "").trim();
+
+  if (!uri) {
     console.error("MongoDB Error: MONGO_URI is missing in environment variables!");
     return;
   }
 
   // 1. Try standard system DNS first (works best in cloud containers like Render / Linux)
   try {
-    await mongoose.connect(process.env.MONGO_URI, {
+    await mongoose.connect(uri, {
       serverSelectionTimeoutMS: 10000,
     });
 
@@ -25,7 +27,7 @@ const connectDB = async () => {
     console.log("Retrying MongoDB connection with Cloudflare DNS fallback...");
     dns.setServers(["1.1.1.1", "1.0.0.1"]);
 
-    await mongoose.connect(process.env.MONGO_URI, {
+    await mongoose.connect(uri, {
       serverSelectionTimeoutMS: 15000,
     });
 
@@ -33,7 +35,6 @@ const connectDB = async () => {
     console.log("Database:", mongoose.connection.name);
   } catch (fallbackError) {
     console.error("MongoDB Atlas connection failed:", fallbackError.message);
-    console.error("Tip: Ensure 0.0.0.0/0 is added to MongoDB Atlas Network Access whitelist.");
   }
 };
 

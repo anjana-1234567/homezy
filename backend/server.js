@@ -61,12 +61,13 @@ app.use("/api/payments", paymentRoutes);
 // HEALTH & STATUS ROUTE
 app.get("/api/health", async (req, res) => {
   let isConnected = mongoose.connection.readyState === 1;
-  const hasMongoUri = Boolean(process.env.MONGO_URI);
+  const rawUri = (process.env.MONGO_URI || "").trim().replace(/^["']|["']$/g, "").trim();
+  const hasMongoUri = Boolean(rawUri);
   let connectionError = null;
 
   if (!isConnected && hasMongoUri) {
     try {
-      await mongoose.connect(process.env.MONGO_URI, {
+      await mongoose.connect(rawUri, {
         serverSelectionTimeoutMS: 8000,
       });
       isConnected = mongoose.connection.readyState === 1;
@@ -78,13 +79,20 @@ app.get("/api/health", async (req, res) => {
   const stateIndex = mongoose.connection.readyState;
   const states = ["disconnected", "connected", "connecting", "disconnecting"];
 
+  let uriStructure = "NOT_CONFIGURED";
+  if (hasMongoUri) {
+    uriStructure = rawUri.replace(/mongodb(?:\+srv)?:\/\/([^:]+):([^@]+)@/, (match, user, pass) => {
+      return `mongodb+srv://${user}:[HIDDEN_${pass.length}_CHARS]@`;
+    });
+  }
+
   res.status(isConnected ? 200 : 503).json({
     success: isConnected,
     status: isConnected ? "healthy" : "database_unavailable",
     database: {
       connected: isConnected,
       hasMongoUri,
-      mongoUriConfigured: hasMongoUri ? "Yes (length: " + process.env.MONGO_URI.length + ")" : "NO - Missing in Render Environment",
+      uriStructure,
       error: connectionError,
       state: states[stateIndex] || "unknown",
       name: mongoose.connection.name || null,
