@@ -59,16 +59,33 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/payments", paymentRoutes);
 
 // HEALTH & STATUS ROUTE
-app.get("/api/health", (req, res) => {
+app.get("/api/health", async (req, res) => {
+  let isConnected = mongoose.connection.readyState === 1;
+  const hasMongoUri = Boolean(process.env.MONGO_URI);
+  let connectionError = null;
+
+  if (!isConnected && hasMongoUri) {
+    try {
+      await mongoose.connect(process.env.MONGO_URI, {
+        serverSelectionTimeoutMS: 8000,
+      });
+      isConnected = mongoose.connection.readyState === 1;
+    } catch (err) {
+      connectionError = err.message;
+    }
+  }
+
   const stateIndex = mongoose.connection.readyState;
   const states = ["disconnected", "connected", "connecting", "disconnecting"];
-  const isConnected = stateIndex === 1;
 
   res.status(isConnected ? 200 : 503).json({
     success: isConnected,
     status: isConnected ? "healthy" : "database_unavailable",
     database: {
       connected: isConnected,
+      hasMongoUri,
+      mongoUriConfigured: hasMongoUri ? "Yes (length: " + process.env.MONGO_URI.length + ")" : "NO - Missing in Render Environment",
+      error: connectionError,
       state: states[stateIndex] || "unknown",
       name: mongoose.connection.name || null,
     },
