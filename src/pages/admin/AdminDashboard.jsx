@@ -24,6 +24,7 @@ import {
 
 } from "lucide-react";
 import { API_ENDPOINTS } from "../../config/api";
+import AnalyticsSection from "../../components/admin/AnalyticsSection";
 
 const API = API_ENDPOINTS.ADMIN;
 const COMPLAINT_API = API_ENDPOINTS.COMPLAINTS;
@@ -478,33 +479,8 @@ function AdminDashboard() {
 
 
   const changePage = (page) => {
-
-
-
     setSidebarOpen(false);
-
-
-
-    if (page === "Analytics") {
-
-
-
-      navigate("/admin/analytics");
-
-
-
-      return;
-
-
-
-    }
-
-
-
     setSearchParams(page === "Dashboard" ? {} : { section: page });
-
-
-
   };
 
 
@@ -869,33 +845,18 @@ function AdminDashboard() {
 
 
 
-              {[["Manage Customers", "Customers"], ["Manage Providers", "Providers"], ["Manage Services", "Services"], ["View Bookings", "Bookings"], ["Manage Complaints", "Complaints"], ["View Reviews", "Reviews"], ["Admin Profile", "Admin Profile"]].map(([label, page]) =>
-
-
-
+              {[["View Analytics", "Analytics"], ["Manage Customers", "Customers"], ["Manage Providers", "Providers"], ["Manage Services", "Services"], ["View Bookings", "Bookings"], ["Manage Complaints", "Complaints"], ["View Reviews", "Reviews"], ["Admin Profile", "Admin Profile"]].map(([label, page]) =>
                 <button type="button" key={page} style={s.quickButton} onClick={() => changePage(page)}>{label} →</button>
-
-
-
               )}
-
-
-
             </div>
-
-
-
           </div>
-
-
-
         </>}
 
-
-
-
-
-
+        {!loading && activePage === "Analytics" && (
+          <AdminErrorBoundary sectionName="Analytics">
+            <AnalyticsSection />
+          </AdminErrorBoundary>
+        )}
 
         {!loading && activePage === "Customers" && (
           <AdminErrorBoundary sectionName="Customers">
