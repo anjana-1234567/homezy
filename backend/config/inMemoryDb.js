@@ -642,42 +642,16 @@ function getModel(modelName, MongooseModel) {
         return target[prop];
       }
 
-      if (prop === "findOne") {
+      // When Atlas is connected, use native Mongoose methods with error fallback
+      if (typeof target[prop] === "function") {
         return function (...args) {
-          const atlasPromise = target.findOne(...args);
-          return new MockQuery(
-            atlasPromise
-              .then((doc) => {
-                if (doc) return doc;
-                return mock.findOne(...args);
-              })
-              .catch(() => mock.findOne(...args)),
-            memoryDb
-          );
-        };
-      }
-
-      if (prop === "find") {
-        return function (...args) {
-          const atlasPromise = target.find(...args);
-          return new MockQuery(
-            atlasPromise
-              .then((docs) => {
-                if (docs && docs.length > 0) return docs;
-                return mock.find(...args);
-              })
-              .catch(() => mock.find(...args)),
-            memoryDb
-          );
-        };
-      }
-
-      if (prop in mock) {
-        return async function (...args) {
           try {
-            return await target[prop](...args);
+            return target[prop](...args);
           } catch (e) {
-            return await mock[prop](...args);
+            if (prop in mock) {
+              return mock[prop](...args);
+            }
+            throw e;
           }
         };
       }
