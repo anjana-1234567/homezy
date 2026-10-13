@@ -87,10 +87,7 @@ router.post("/create-order", async (req, res) => {
       });
     }
 
-    if (
-      !process.env.RAZORPAY_KEY_ID ||
-      !process.env.RAZORPAY_KEY_SECRET
-    ) {
+    if (!razorpayKeyId || !razorpayKeySecret || !razorpay) {
       console.error("Razorpay credentials are missing");
       return res.status(500).json({
         success: false,
@@ -115,7 +112,7 @@ router.post("/create-order", async (req, res) => {
       orderId: order.id,
       amount: order.amount,
       currency: order.currency,
-      keyId: process.env.RAZORPAY_KEY_ID,
+      keyId: razorpayKeyId,
     });
   } catch (error) {
     console.error("Create order error:", {
@@ -178,7 +175,7 @@ router.post("/verify", async (req, res) => {
       });
     }
 
-    const secret = process.env.RAZORPAY_KEY_SECRET;
+    const secret = razorpayKeySecret;
 
     if (!secret) {
       console.error("Razorpay secret is missing");

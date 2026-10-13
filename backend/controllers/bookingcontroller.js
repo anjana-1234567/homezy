@@ -81,6 +81,35 @@ const createBooking = async (req, res) => {
         ? "RAZORPAY"
         : "CASH";
 
+    // Deduplication: prevent creating duplicate bookings for the same slot
+    const existingPendingBooking = await Booking.findOne({
+      customerId: customer._id,
+      providerId: provider._id,
+      service: service.trim(),
+      bookingDate: bookingDate.trim(),
+      bookingTime: bookingTime.trim(),
+      status: "REQUESTED",
+    }).sort({ createdAt: -1 });
+
+    if (existingPendingBooking) {
+      existingPendingBooking.paymentMethod = selectedPaymentMethod;
+      existingPendingBooking.price = numericPrice;
+      if (customerLocation?.latitude && customerLocation?.longitude) {
+        existingPendingBooking.customerLocation = {
+          latitude: Number(customerLocation.latitude),
+          longitude: Number(customerLocation.longitude),
+          address: customerLocation.address || existingPendingBooking.customerLocation?.address || "",
+        };
+      }
+      await existingPendingBooking.save();
+
+      return res.status(200).json({
+        success: true,
+        message: "Booking request updated",
+        booking: existingPendingBooking,
+      });
+    }
+
     const booking = await Booking.create({
       customerId: customer._id,
 

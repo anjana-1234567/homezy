@@ -30,6 +30,7 @@ function MyBookings() {
   const [error, setError] = useState("");
   const [acceptedPopup, setAcceptedPopup] = useState(null);
   const [notificationCount, setNotificationCount] = useState(0);
+  const [activeFilter, setActiveFilter] = useState("ALL");
 
   const previousStatuses = useRef({});
   const initializedStatuses = useRef(false);
@@ -238,6 +239,16 @@ function MyBookings() {
   const upcomingBookings = bookings.filter((booking) =>
     ["REQUESTED", "ACCEPTED"].includes(booking.status)
   ).length;
+  const cancelledBookings = bookings.filter((booking) =>
+    ["CANCELLED", "REJECTED"].includes(booking.status)
+  ).length;
+
+  const displayedBookings = bookings.filter((booking) => {
+    if (activeFilter === "ACTIVE") return ["REQUESTED", "ACCEPTED"].includes(booking.status);
+    if (activeFilter === "COMPLETED") return booking.status === "COMPLETED";
+    if (activeFilter === "CANCELLED") return ["CANCELLED", "REJECTED"].includes(booking.status);
+    return true;
+  });
 
   return (
     <>
@@ -274,17 +285,29 @@ function MyBookings() {
       </header>
 
       <div className="booking-summary-grid">
-        <div className="summary-card">
+        <div
+          className="summary-card"
+          onClick={() => setActiveFilter("ALL")}
+          style={{ cursor: "pointer", outline: activeFilter === "ALL" ? "2px solid #ea580c" : "none" }}
+        >
           <div className="summary-icon"><CalendarCheck size={23} /></div>
           <div><span>Total Bookings</span><strong>{totalBookings}</strong></div>
         </div>
 
-        <div className="summary-card">
+        <div
+          className="summary-card"
+          onClick={() => setActiveFilter("ACTIVE")}
+          style={{ cursor: "pointer", outline: activeFilter === "ACTIVE" ? "2px solid #ea580c" : "none" }}
+        >
           <div className="summary-icon"><Clock size={23} /></div>
           <div><span>Upcoming</span><strong>{upcomingBookings}</strong></div>
         </div>
 
-        <div className="summary-card">
+        <div
+          className="summary-card"
+          onClick={() => setActiveFilter("COMPLETED")}
+          style={{ cursor: "pointer", outline: activeFilter === "COMPLETED" ? "2px solid #ea580c" : "none" }}
+        >
           <div className="summary-icon"><CheckCircle size={23} /></div>
           <div><span>Completed</span><strong>{completedBookings}</strong></div>
         </div>
@@ -299,6 +322,34 @@ function MyBookings() {
         <button type="button" onClick={() => navigate("/customer/find-services")}>
           Book New Service <ChevronRight size={18} />
         </button>
+      </div>
+
+      <div style={{ display: "flex", gap: "10px", margin: "16px 0", flexWrap: "wrap" }}>
+        {[
+          { key: "ALL", label: `All (${totalBookings})` },
+          { key: "ACTIVE", label: `Active / Upcoming (${upcomingBookings})` },
+          { key: "COMPLETED", label: `Completed (${completedBookings})` },
+          { key: "CANCELLED", label: `Cancelled (${cancelledBookings})` },
+        ].map((tab) => (
+          <button
+            key={tab.key}
+            type="button"
+            onClick={() => setActiveFilter(tab.key)}
+            style={{
+              padding: "7px 16px",
+              borderRadius: "20px",
+              border: activeFilter === tab.key ? "2px solid #ea580c" : "1px solid #e5e7eb",
+              background: activeFilter === tab.key ? "#fff7ed" : "#fff",
+              color: activeFilter === tab.key ? "#c2410c" : "#4b5563",
+              fontWeight: activeFilter === tab.key ? "600" : "500",
+              cursor: "pointer",
+              fontSize: "13px",
+              transition: "all 0.2s ease",
+            }}
+          >
+            {tab.label}
+          </button>
+        ))}
       </div>
 
       {loading && (
@@ -339,9 +390,17 @@ function MyBookings() {
         </div>
       )}
 
-      {!loading && !error && bookings.length > 0 && (
+      {!loading && !error && bookings.length > 0 && displayedBookings.length === 0 && (
+        <div className="booking-empty-state">
+          <CalendarCheck size={45} />
+          <h3>No bookings in this category</h3>
+          <p>No bookings match the selected status filter.</p>
+        </div>
+      )}
+
+      {!loading && !error && displayedBookings.length > 0 && (
         <div className="bookings-list">
-          {bookings.map((booking) => {
+          {displayedBookings.map((booking) => {
             const providerPhone = getProviderPhone(booking);
 
             return (

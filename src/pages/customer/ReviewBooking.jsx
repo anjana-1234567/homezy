@@ -205,12 +205,17 @@ function ReviewBooking() {
       }
 
       const options = {
-        key: orderData.keyId,
+        key: orderData.keyId || "rzp_test_Tmjnygk2th7v2b",
         amount: orderData.amount,
-        currency: orderData.currency,
+        currency: orderData.currency || "INR",
         name: "Homezy",
         description: selectedService.name,
         order_id: orderData.orderId,
+        prefill: {
+          name: user?.name || "Customer",
+          email: user?.email || "customer@homezy.com",
+          contact: user?.phone || "9876543210",
+        },
 
         handler: async (paymentResponse) => {
           try {
@@ -243,7 +248,7 @@ function ReviewBooking() {
           } catch (error) {
             console.error("Payment verification error:", error);
             alert(
-              `${error.message} Your booking may still exist. Check My Bookings before retrying.`
+              `${error.message} Check My Bookings to track your booking.`
             );
           } finally {
             setLoading(false);
@@ -253,9 +258,6 @@ function ReviewBooking() {
         modal: {
           ondismiss: () => {
             setLoading(false);
-            alert(
-              "Payment window closed. Your booking may still exist with payment pending. Check My Bookings before retrying."
-            );
           },
         },
 
