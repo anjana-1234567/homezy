@@ -1,7 +1,7 @@
 // Centralized API configuration for Homezy frontend
 
 const rawUrl = (
-  import.meta.env.VITE_API_URL || "https://homezy-xtr2.onrender.com"
+  import.meta.env.VITE_API_URL || "https://homezy-1.onrender.com"
 )
   .trim()
   .replace(/\/+$/, "");
