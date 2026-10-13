@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 
 
 
@@ -30,11 +30,80 @@ const COMPLAINT_API = API_ENDPOINTS.COMPLAINTS;
 const REVIEW_API = API_ENDPOINTS.REVIEWS;
 const SERVICE_API = API_ENDPOINTS.SERVICES;
 
+const toSafeString = (val, fallback = "") => {
+  if (val === null || val === undefined) return fallback;
+  if (typeof val === "string") return val.trim() || fallback;
+  if (typeof val === "number" || typeof val === "boolean") return String(val);
+  if (typeof val === "object") {
+    return (
+      val.name ||
+      val.service ||
+      val.bookingCode ||
+      val.title ||
+      val._id ||
+      fallback
+    );
+  }
+  return fallback;
+};
 
+class AdminErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
 
+  static getDerivedStateFromError(error) {
+    return { hasError: true, error };
+  }
 
+  componentDidCatch(error, errorInfo) {
+    console.error(
+      `Admin section error [${this.props.sectionName || "unknown"}]:`,
+      error,
+      errorInfo
+    );
+  }
 
-
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div
+          style={{
+            background: "#fff",
+            borderRadius: 16,
+            padding: 24,
+            border: "1px solid #fee2e2",
+            boxShadow: "0 5px 20px rgba(15,23,42,.06)",
+          }}
+        >
+          <h3 style={{ color: "#991b1b", marginTop: 0 }}>
+            Unable to display {this.props.sectionName || "this section"}
+          </h3>
+          <p style={{ color: "#64748b", fontSize: 14 }}>
+            {this.state.error?.message || "An unexpected error occurred while rendering."}
+          </p>
+          <button
+            type="button"
+            onClick={() => this.setState({ hasError: false, error: null })}
+            style={{
+              padding: "10px 18px",
+              background: "#B87943",
+              color: "#fff",
+              border: 0,
+              borderRadius: 8,
+              fontWeight: 600,
+              cursor: "pointer",
+            }}
+          >
+            Retry Section
+          </button>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
 
 function AdminDashboard() {
 
@@ -828,32 +897,72 @@ function AdminDashboard() {
 
 
 
-        {!loading && activePage === "Customers" && <UserTable title="All Customers" users={customers} type="customer" />}
+        {!loading && activePage === "Customers" && (
+          <AdminErrorBoundary sectionName="Customers">
+            <UserTable title="All Customers" users={customers} type="customer" />
+          </AdminErrorBoundary>
+        )}
 
+        {!loading && activePage === "Providers" && (
+          <AdminErrorBoundary sectionName="Providers">
+            <UserTable title="All Providers" users={providers} type="provider" />
+          </AdminErrorBoundary>
+        )}
 
+        {!loading && activePage === "Bookings" && (
+          <AdminErrorBoundary sectionName="Bookings">
+            <BookingTable bookings={bookings} />
+          </AdminErrorBoundary>
+        )}
 
-        {!loading && activePage === "Providers" && <UserTable title="All Providers" users={providers} type="provider" />}
+        {!loading && activePage === "Complaints" && (
+          <AdminErrorBoundary sectionName="Complaints">
+            <ComplaintTable
+              complaints={complaints}
+              onComplaintUpdated={(updated) => {
+                setComplaints((previous) =>
+                  previous.map((c) =>
+                    c._id === updated._id ? { ...c, ...updated } : c
+                  )
+                );
+                setStats((prev) => ({
+                  ...prev,
+                  pendingComplaints: Math.max(
+                    0,
+                    (Number(prev.pendingComplaints) || 1) - 1
+                  ),
+                }));
+              }}
+            />
+          </AdminErrorBoundary>
+        )}
 
+        {!loading && activePage === "Reviews" && (
+          <AdminErrorBoundary sectionName="Reviews">
+            <ReviewsSection
+              reviews={reviews}
+              loading={reviewsLoading}
+              error={reviewsError}
+              search={reviewSearch}
+              setSearch={setReviewSearch}
+              ratingFilter={ratingFilter}
+              setRatingFilter={setRatingFilter}
+              onRefresh={loadReviews}
+            />
+          </AdminErrorBoundary>
+        )}
 
+        {!loading && activePage === "Admin Profile" && (
+          <AdminErrorBoundary sectionName="Admin Profile">
+            <AdminProfileSection />
+          </AdminErrorBoundary>
+        )}
 
-        {!loading && activePage === "Bookings" && <BookingTable bookings={bookings} />}
-
-
-
-        {!loading && activePage === "Complaints" && <ComplaintTable complaints={complaints} onComplaintUpdated={updated => setComplaints(previous => previous.map(c => c._id === updated._id ? { ...c, ...updated } : c))} />}
-
-
-
-        {!loading && activePage === "Reviews" && <ReviewsSection reviews={reviews} loading={reviewsLoading} error={reviewsError} search={reviewSearch} setSearch={setReviewSearch} ratingFilter={ratingFilter} setRatingFilter={setRatingFilter} onRefresh={loadReviews} />}
-
-
-
-        {!loading && activePage === "Admin Profile" && <AdminProfileSection />}
-
-
-
-       {!loading && activePage === "Services" && <ServicesSection />}
-
+        {!loading && activePage === "Services" && (
+          <AdminErrorBoundary sectionName="Services">
+            <ServicesSection />
+          </AdminErrorBoundary>
+        )}
       </main>
 
 
@@ -875,321 +984,265 @@ function AdminDashboard() {
 
 
 function ComplaintTable({ complaints = [], onComplaintUpdated }) {
-
-
-
-  const [items, setItems] = useState(complaints);
-
-
-
+  const [items, setItems] = useState(Array.isArray(complaints) ? complaints : []);
   const [savingId, setSavingId] = useState("");
-
-
-
   const [message, setMessage] = useState("");
-
-
-
   const [messageType, setMessageType] = useState("success");
 
+  useEffect(() => {
+    setItems(Array.isArray(complaints) ? complaints : []);
+  }, [complaints]);
 
+  const saveComplaint = async (complaint, e) => {
+    if (e) {
+      if (typeof e.preventDefault === "function") e.preventDefault();
+      if (typeof e.stopPropagation === "function") e.stopPropagation();
+    }
 
-
-
-
-
-  useEffect(() => setItems(complaints), [complaints]);
-
-
-
-
-
-
-
-  const updateItem = (id, field, value) => {
-
-
-
-    setItems(previous => previous.map(item => item._id === id ? { ...item, [field]: value } : item));
-
-
-
-    setMessage("");
-
-
-
-  };
-
-
-
-
-
-
-
-  const saveComplaint = async (complaint) => {
-
-
+    if (!complaint?._id || savingId === complaint._id) return;
 
     setSavingId(complaint._id);
-
-
-
     setMessage("");
 
-
-
     try {
-
-
-
-      // Backend route from complaintRoutes.js: PATCH /api/complaints/:complaintId/resolve
-
-
-
-      // This endpoint resolves the complaint. The dropdown is retained for display,
-
-
-
-      // but this button intentionally sends the resolve request only.
-
-
-
       const response = await fetch(`${COMPLAINT_API}/${complaint._id}/resolve`, {
-
-
-
         method: "PATCH",
-
-
-
         headers: { "Content-Type": "application/json" },
-
-
-
       });
-
-
 
       const result = await response.json().catch(() => ({}));
 
-
-
       if (!response.ok || !result.success) {
-
-
-
         throw new Error(result.message || `Could not resolve complaint (${response.status}).`);
-
-
-
       }
 
+      // Preserve populated customer/booking/provider from existing complaint
+      // in case the API response returned raw string ObjectIds
+      const rawComp = result.complaint || {};
+      const updated = {
+        ...complaint,
+        ...rawComp,
+        status: "RESOLVED",
+        customerId:
+          rawComp.customerId && typeof rawComp.customerId === "object"
+            ? rawComp.customerId
+            : (complaint.customerId || rawComp.customerId),
+        bookingId:
+          rawComp.bookingId && typeof rawComp.bookingId === "object"
+            ? rawComp.bookingId
+            : (complaint.bookingId || rawComp.bookingId),
+        providerId:
+          rawComp.providerId && typeof rawComp.providerId === "object"
+            ? rawComp.providerId
+            : (complaint.providerId || rawComp.providerId),
+      };
 
-
-      const updated = { ...complaint, ...(result.complaint || {}), status: "RESOLVED" };
-
-
-
-      setItems(previous => previous.map(item => item._id === complaint._id ? { ...item, ...updated } : item));
-
-
+      setItems(previous =>
+        previous.map(item => (item._id === complaint._id ? updated : item))
+      );
 
       onComplaintUpdated?.(updated);
 
-
-
       setMessage("Complaint resolved successfully!");
-
-
-
       setMessageType("success");
-
-
-
     } catch (error) {
-
-
-
       console.error("Resolve complaint error:", error);
-
-
-
-      setMessage(error.message || "Failed to resolve complaint.");
-
-
-
+      setMessage(error?.message || "Failed to resolve complaint.");
       setMessageType("error");
-
-
-
     } finally {
-
-
-
       setSavingId("");
-
-
-
     }
-
-
-
   };
 
-
-
-
-
-
-
-  const statusColor = status => ({
-
-
-
-    "IN REVIEW": { bg: "#fef3c7", color: "#92400e" },
-
-
-
-    RESOLVED: { bg: "#dcfce7", color: "#166534" },
-
-
-
-    REJECTED: { bg: "#fee2e2", color: "#991b1b" },
-
-
-
-  }[String(status || "IN REVIEW").toUpperCase()] || { bg: "#fef3c7", color: "#92400e" });
-
-
-
-
-
-
-
-  return <div className="admin-table-wrap">
-
-
-
-    <h2 style={{ marginTop: 0 }}>Customer Complaints ({items.length})</h2>
-
-
-
-    {message && <p role="status" style={{ padding: 12, borderRadius: 8, background: messageType === "success" ? "#dcfce7" : "#fee2e2", color: messageType === "success" ? "#166534" : "#991b1b" }}>{message}</p>}
-
-
-
-    {items.length === 0 ? <Empty text="No complaints found." /> : <div style={{ display: "grid", gap: 18 }}>
-
-
-
-      {items.map(complaint => {
-
-
-
-        const booking = complaint.bookingId && typeof complaint.bookingId === "object" ? complaint.bookingId : null;
-
-
-
-        const bookingId = complaint.bookingCode || booking?.bookingCode || booking?._id || complaint.bookingId || complaint.booking?._id || "Not available";
-
-
-
-        const customer = complaint.customerId && typeof complaint.customerId === "object" ? complaint.customerId : null;
-
-
-
-        const color = statusColor(complaint.status);
-
-
-
-        return <div key={complaint._id} style={{ border: "1px solid #EADCCF", borderRadius: 14, padding: 20, background: "#fff" }}>
-
-
-
-          <div style={s.complaintHeader}>
-
-
-
-            <h3 style={{ margin: 0, color: "#2B1B14" }}>{complaint.complaintType || complaint.service || "Customer Complaint"}</h3>
-
-
-
-            <span style={{ background: color.bg, color: color.color, borderRadius: 20, padding: "6px 12px", fontSize: 12, fontWeight: 700 }}>{complaint.status || "IN REVIEW"}</span>
-
-
-
-          </div>
-
-
-
-          <p style={s.complaintText}><strong>Customer:</strong> {customer?.name || "Not available"} {customer?.email ? `(${customer.email})` : ""}</p>
-
-
-
-          <p style={s.complaintText}><strong>Booking ID:</strong> {String(bookingId)}</p>
-
-
-
-          <p style={s.complaintText}><strong>Service:</strong> {complaint.service || booking?.service || "Not specified"}</p>
-
-
-
-          <p style={{ color: "#49352A", lineHeight: 1.6 }}><strong>Description:</strong> {complaint.description || "No description provided."}</p>
-
-
-
-          <div style={{ marginTop: 18 }}>
-
-
-
-            <label htmlFor={`complaint-status-${complaint._id}`} style={{ display: "block", marginBottom: 7, fontWeight: 600, fontSize: 13 }}>Status</label>
-
-
-
-            <select id={`complaint-status-${complaint._id}`} value={complaint.status || "IN REVIEW"} disabled style={s.complaintSelect}>
-
-
-
-              <option value="IN REVIEW">In Review</option><option value="RESOLVED">Resolved</option><option value="REJECTED">Rejected</option>
-
-
-
-            </select>
-
-
-
-          </div>
-
-
-
-          <button type="button" onClick={() => saveComplaint(complaint)} disabled={savingId === complaint._id || complaint.status === "RESOLVED"} style={{ marginTop: 16, padding: "11px 18px", border: 0, borderRadius: 8, background: complaint.status === "RESOLVED" ? "#16a34a" : "#B87943", color: "#fff", fontWeight: 600, cursor: "pointer", opacity: savingId === complaint._id ? 0.6 : 1 }}>
-
-
-
-            {savingId === complaint._id ? "Resolving..." : complaint.status === "RESOLVED" ? "Resolved" : "Resolve Complaint"}
-
-
-
-          </button>
-
-
-
-        </div>;
-
-
-
-      })}
-
-
-
-    </div>}
-
-
-
-  </div>;
-
-
-
+  const statusColor = status => {
+    const normalized = toSafeString(status, "IN REVIEW").toUpperCase();
+    return (
+      {
+        "IN REVIEW": { bg: "#fef3c7", color: "#92400e" },
+        RESOLVED: { bg: "#dcfce7", color: "#166534" },
+        REJECTED: { bg: "#fee2e2", color: "#991b1b" },
+      }[normalized] || { bg: "#fef3c7", color: "#92400e" }
+    );
+  };
+
+  return (
+    <div className="admin-table-wrap">
+      <h2 style={{ marginTop: 0 }}>Customer Complaints ({items.length})</h2>
+
+      {message && (
+        <p
+          role="status"
+          style={{
+            padding: 12,
+            borderRadius: 8,
+            background: messageType === "success" ? "#dcfce7" : "#fee2e2",
+            color: messageType === "success" ? "#166534" : "#991b1b",
+          }}
+        >
+          {message}
+        </p>
+      )}
+
+      {items.length === 0 ? (
+        <Empty text="No complaints found." />
+      ) : (
+        <div style={{ display: "grid", gap: 18 }}>
+          {items.map(complaint => {
+            if (!complaint || typeof complaint !== "object") return null;
+
+            const booking =
+              complaint.bookingId && typeof complaint.bookingId === "object"
+                ? complaint.bookingId
+                : null;
+
+            const customer =
+              complaint.customerId && typeof complaint.customerId === "object"
+                ? complaint.customerId
+                : null;
+
+            const customerName = toSafeString(
+              customer?.name,
+              typeof complaint.customerId === "string"
+                ? complaint.customerId
+                : "Not available"
+            );
+
+            const customerEmail = toSafeString(customer?.email, "");
+
+            const bookingCode = toSafeString(
+              complaint.bookingCode ||
+                booking?.bookingCode ||
+                booking?._id ||
+                (typeof complaint.bookingId === "string"
+                  ? complaint.bookingId
+                  : complaint.bookingId?._id),
+              "Not available"
+            );
+
+            const serviceName = toSafeString(
+              complaint.service || booking?.service,
+              "Not specified"
+            );
+
+            const complaintTypeTitle = toSafeString(
+              complaint.complaintType,
+              serviceName !== "Not specified" ? serviceName : "Customer Complaint"
+            );
+
+            const descriptionText = toSafeString(
+              complaint.description,
+              "No description provided."
+            );
+
+            const currentStatus = toSafeString(
+              complaint.status,
+              "IN REVIEW"
+            ).toUpperCase();
+
+            const isResolved = currentStatus === "RESOLVED";
+            const isSaving = savingId === complaint._id;
+            const color = statusColor(currentStatus);
+
+            return (
+              <div
+                key={complaint._id || Math.random()}
+                style={{
+                  border: "1px solid #EADCCF",
+                  borderRadius: 14,
+                  padding: 20,
+                  background: "#fff",
+                }}
+              >
+                <div style={s.complaintHeader}>
+                  <h3 style={{ margin: 0, color: "#2B1B14" }}>
+                    {complaintTypeTitle}
+                  </h3>
+                  <span
+                    style={{
+                      background: color.bg,
+                      color: color.color,
+                      borderRadius: 20,
+                      padding: "6px 12px",
+                      fontSize: 12,
+                      fontWeight: 700,
+                    }}
+                  >
+                    {currentStatus}
+                  </span>
+                </div>
+
+                <p style={s.complaintText}>
+                  <strong>Customer:</strong> {customerName}{" "}
+                  {customerEmail ? `(${customerEmail})` : ""}
+                </p>
+
+                <p style={s.complaintText}>
+                  <strong>Booking ID:</strong> {bookingCode}
+                </p>
+
+                <p style={s.complaintText}>
+                  <strong>Service:</strong> {serviceName}
+                </p>
+
+                <p style={{ color: "#49352A", lineHeight: 1.6 }}>
+                  <strong>Description:</strong> {descriptionText}
+                </p>
+
+                <div style={{ marginTop: 18 }}>
+                  <label
+                    htmlFor={`complaint-status-${complaint._id}`}
+                    style={{
+                      display: "block",
+                      marginBottom: 7,
+                      fontWeight: 600,
+                      fontSize: 13,
+                    }}
+                  >
+                    Status
+                  </label>
+                  <select
+                    id={`complaint-status-${complaint._id}`}
+                    value={currentStatus}
+                    disabled
+                    style={s.complaintSelect}
+                  >
+                    <option value="IN REVIEW">In Review</option>
+                    <option value="RESOLVED">Resolved</option>
+                    <option value="REJECTED">Rejected</option>
+                  </select>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={(e) => saveComplaint(complaint, e)}
+                  disabled={isSaving || isResolved}
+                  style={{
+                    marginTop: 16,
+                    padding: "11px 18px",
+                    border: 0,
+                    borderRadius: 8,
+                    background: isResolved ? "#16a34a" : "#B87943",
+                    color: "#fff",
+                    fontWeight: 600,
+                    cursor: isResolved ? "default" : "pointer",
+                    opacity: isSaving ? 0.6 : 1,
+                    touchAction: "manipulation",
+                    WebkitTapHighlightColor: "transparent",
+                  }}
+                >
+                  {isSaving
+                    ? "Resolving..."
+                    : isResolved
+                    ? "Resolved"
+                    : "Resolve Complaint"}
+                </button>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
 }
 
 

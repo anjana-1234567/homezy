@@ -142,15 +142,40 @@ const resolveComplaint = async (req, res) => {
     }
 
     if (complaint.status === "RESOLVED") {
+      const alreadyPopulated = await Complaint.findById(complaint._id)
+        .populate("customerId", "name email phone")
+        .populate("providerId", "name email phone")
+        .populate(
+          "bookingId",
+          "service bookingCode bookingDate bookingTime price status"
+        );
+
       return res.json({
         success: true,
         message: "Complaint is already resolved.",
-        complaint,
+        complaint: alreadyPopulated || complaint,
       });
     }
 
     complaint.status = "RESOLVED";
     await complaint.save();
+
+    // Also update embedded complaint in Booking if linked
+    try {
+      if (complaint.bookingId) {
+        const booking = await Booking.findById(complaint.bookingId);
+        if (booking && booking.complaint) {
+          booking.complaint.status = "RESOLVED";
+          booking.complaint.resolvedAt = new Date();
+          await booking.save();
+        }
+      }
+    } catch (bookingError) {
+      console.error(
+        "Booking complaint status update error:",
+        bookingError.message
+      );
+    }
 
     // Notify the customer, if notifications are supported by the User model
     try {
@@ -172,10 +197,18 @@ const resolveComplaint = async (req, res) => {
       );
     }
 
+    const populatedComplaint = await Complaint.findById(complaint._id)
+      .populate("customerId", "name email phone")
+      .populate("providerId", "name email phone")
+      .populate(
+        "bookingId",
+        "service bookingCode bookingDate bookingTime price status"
+      );
+
     return res.json({
       success: true,
       message: "Complaint resolved successfully.",
-      complaint,
+      complaint: populatedComplaint || complaint,
     });
   } catch (error) {
     console.error("Resolve complaint error:", error);
